@@ -11,21 +11,21 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-1">
         {label && (
-          <label className="text-sm font-medium leading-none text-gray-900 dark:text-gray-100">
+          <label className="text-xs font-arcade uppercase leading-none text-[color:var(--neon-cyan)]">
             {label}
           </label>
         )}
         <input
           ref={ref}
           className={clsx(
-            'flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-950 dark:text-gray-100 dark:placeholder:text-gray-400',
-            error && 'border-red-500 focus-visible:ring-red-500',
+            'flex h-10 w-full rounded-none border-2 border-[color:var(--neon-cyan)]/40 bg-[color:var(--inset-bg)] px-3 py-2 text-lg font-terminal text-[color:var(--foreground)] placeholder:text-[color:var(--muted-foreground)] focus-visible:outline-none focus-visible:border-[color:var(--neon-cyan)] focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50',
+            error && 'border-[color:var(--neon-red)] focus-visible:border-[color:var(--neon-red)]',
             className
           )}
           {...props}
         />
         {error && (
-          <p className="text-sm text-red-500">{error}</p>
+          <p className="text-sm text-[color:var(--neon-red)]">{error}</p>
         )}
       </div>
     );

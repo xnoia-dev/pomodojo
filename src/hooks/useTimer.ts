@@ -127,7 +127,7 @@ export function useTimer({ onFocusSessionComplete }: UseTimerProps = {}) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    
+
     setTimerState(prev => {
       const correctDuration = getSessionDuration(prev.sessionType, config);
       return {
@@ -137,6 +137,24 @@ export function useTimer({ onFocusSessionComplete }: UseTimerProps = {}) {
       };
     });
   }, [config, getSessionDuration]);
+
+  // Full reset: wipes session/round progress and starts back at Round 1,
+  // unlike resetTimer() which only restarts the current session's clock.
+  const hardReset = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    setTimerState({
+      status: 'idle',
+      sessionType: 'focus',
+      timeRemaining: config.focusTime * 60,
+      currentSession: 1,
+      totalSessions: 0,
+      config,
+    });
+  }, [config]);
 
   const skipSession = useCallback(() => {
     if (intervalRef.current) {
@@ -201,6 +219,7 @@ export function useTimer({ onFocusSessionComplete }: UseTimerProps = {}) {
     startTimer,
     pauseTimer,
     resetTimer,
+    hardReset,
     skipSession,
     startNextSession,
     updateConfig,

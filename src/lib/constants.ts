@@ -14,11 +14,15 @@ export const STORAGE_KEYS = {
   THEME: 'pomodoro_theme',
   SOUND_ENABLED: 'pomodoro_sound',
   TODOS: 'pomodoro_todos',
+  PLAYER_NAME: 'pomodoro_player_name',
 } as const;
 
 export const KEYBOARD_SHORTCUTS = {
   START_PAUSE: ' ', // Space
   RESET: 'r',
   SKIP: 's',
-  SETTINGS: 't',
+  HARD_RESET: 't',
+  SUMMARIZE: 'w',
+  SETTINGS: 'q',
+  AUDIO: 'a',
 } as const;

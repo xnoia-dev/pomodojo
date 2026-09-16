@@ -24,74 +24,58 @@ export function TimerControls({
   const showNext = timerState.status === 'completed';
 
   return (
-    <div className={`flex items-center justify-center ${canStart && !canReset ? '' : 'gap-6'}`}>
-      {/* Start/Pause Button - Main CTA dengan modern design */}
+    <div className="flex items-center justify-center gap-4 flex-wrap">
+      {/* Start/Pause Button - Main CTA, big arcade button */}
       {canStart && (
         <button
           onClick={onStart}
-          className="group relative w-20 h-20 bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600 rounded-full shadow-2xl hover:shadow-blue-500/25 hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
+          className="arcade-btn group relative w-16 h-16 rounded-full bg-[color:var(--neon-green)]/10 text-[color:var(--neon-green)] hover:bg-[color:var(--neon-green)]/20 flex items-center justify-center"
+          title="Start"
         >
-          {/* Glow effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300" />
-          
-          {/* Inner circle */}
-          <div className="absolute inset-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20" />
-          
-          {/* Play icon */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
-          </div>
+          <div
+            className="w-0 h-0 border-l-[14px] border-l-current border-t-[9px] border-t-transparent border-b-[9px] border-b-transparent ml-1"
+          />
         </button>
       )}
-      
+
       {canPause && (
         <button
           onClick={onPause}
-          className="group relative w-20 h-20 bg-gradient-to-br from-orange-500 via-red-500 to-pink-600 rounded-full shadow-2xl hover:shadow-red-500/25 hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
+          className="arcade-btn group relative w-16 h-16 rounded-full bg-[color:var(--neon-red)]/10 text-[color:var(--neon-red)] hover:bg-[color:var(--neon-red)]/20 flex items-center justify-center"
+          title="Pause"
         >
-          {/* Glow effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400 to-pink-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300" />
-          
-          {/* Inner circle */}
-          <div className="absolute inset-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20" />
-          
-          {/* Pause icon */}
-          <div className="absolute inset-0 flex items-center justify-center gap-1.5">
-            <div className="w-1.5 h-6 bg-white rounded-full" />
-            <div className="w-1.5 h-6 bg-white rounded-full" />
+          <div className="flex items-center gap-1.5">
+            <div className="w-1.5 h-5 bg-current" />
+            <div className="w-1.5 h-5 bg-current" />
           </div>
         </button>
       )}
 
-      {/* Secondary Controls dengan modern card design */}
+      {/* Secondary Controls */}
       <div className="flex items-center gap-3">
         {canReset && (
           <button
             onClick={onReset}
-            className="group relative w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-200"
+            className="arcade-btn w-12 h-12 rounded-none bg-[color:var(--neon-cyan)]/10 text-[color:var(--neon-cyan)] hover:bg-[color:var(--neon-cyan)]/20 flex items-center justify-center"
+            title="Reset"
           >
-            {/* Reset icon - Circular arrow */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-                <path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-current">
+              <path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
         )}
 
         {canSkip && (
           <button
             onClick={onSkip}
-            className="group relative w-14 h-14 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-200"
+            className="arcade-btn w-12 h-12 rounded-none bg-[color:var(--neon-yellow)]/10 text-[color:var(--neon-yellow)] hover:bg-[color:var(--neon-yellow)]/20 flex items-center justify-center"
+            title="Skip"
           >
-            {/* Skip icon */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
-                <polygon points="5,4 15,12 5,20" fill="currentColor"/>
-                <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-current">
+              <polygon points="5,4 15,12 5,20" fill="currentColor"/>
+              <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
           </button>
         )}
       </div>
@@ -100,15 +84,11 @@ export function TimerControls({
       {showNext && onNext && (
         <button
           onClick={onNext}
-          className="group relative px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl shadow-xl hover:shadow-emerald-500/25 hover:scale-105 active:scale-95 transition-all duration-300 ease-out"
+          className="arcade-btn relative px-5 py-3 rounded-none bg-[color:var(--neon-magenta)]/10 text-[color:var(--neon-magenta)] hover:bg-[color:var(--neon-magenta)]/20"
         >
-          {/* Glow effect */}
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300" />
-          
-          {/* Content */}
-          <div className="relative flex items-center gap-3">
-            <span className="font-semibold text-white text-lg">Next Session</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-white">
+          <div className="relative flex items-center gap-2">
+            <span className="font-arcade text-xs">Next</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-current">
               <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>

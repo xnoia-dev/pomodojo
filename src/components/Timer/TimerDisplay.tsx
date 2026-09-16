@@ -8,9 +8,9 @@ interface TimerDisplayProps {
 export function TimerDisplay({ timerState }: TimerDisplayProps) {
   const minutes = Math.floor(timerState.timeRemaining / 60);
   const seconds = timerState.timeRemaining % 60;
-  
+
   const formatTime = (time: number) => time.toString().padStart(2, '0');
-  
+
   const getSessionTitle = () => {
     switch (timerState.sessionType) {
       case 'focus':
@@ -24,16 +24,16 @@ export function TimerDisplay({ timerState }: TimerDisplayProps) {
     }
   };
 
-  const getSessionColor = () => {
+  const getSessionTextClass = () => {
     switch (timerState.sessionType) {
       case 'focus':
-        return 'text-purple-600 dark:text-purple-400';
+        return 'neon-text-magenta';
       case 'break':
-        return 'text-emerald-600 dark:text-emerald-400';
+        return 'neon-text-cyan';
       case 'longBreak':
-        return 'text-blue-600 dark:text-blue-400';
+        return 'neon-text-yellow';
       default:
-        return 'text-indigo-600 dark:text-indigo-400';
+        return 'neon-text-magenta';
     }
   };
 
@@ -50,25 +50,25 @@ export function TimerDisplay({ timerState }: TimerDisplayProps) {
           return timerState.config.focusTime * 60;
       }
     })();
-    
+
     return ((totalTime - timerState.timeRemaining) / totalTime) * 100;
   };
 
   return (
-    <div className="text-center space-y-8">
+    <div className="text-center flex flex-col items-center gap-3">
       {/* Session Type */}
-      <div className="space-y-1 mb-0">
-        <h1 className={clsx('text-3xl font-bold mb-3 pt-3 timer-title', getSessionColor())}>
-          {getSessionTitle()}
+      <div>
+        <h1 className={clsx('text-lg sm:text-xl font-arcade timer-title', getSessionTextClass())}>
+          {getSessionTitle()}<span className="blink">_</span>
         </h1>
-        <p className="text-gray-600 dark:text-gray-300 font-medium text-lg">
-          Session {timerState.currentSession} • {timerState.totalSessions} completed
+        <p className="text-[color:var(--muted-foreground)] font-terminal text-lg tracking-widest uppercase mt-1">
+          Round {timerState.currentSession} :: {timerState.totalSessions} cleared
         </p>
       </div>
 
       {/* Timer Circle */}
-      <div className="relative w-64 h-64 mx-auto mb-2">
-        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+      <div className={clsx('relative w-52 h-52 sm:w-60 sm:h-60 mx-auto', getSessionTextClass())}>
+        <svg className="w-full h-full transform -rotate-90 timer-circle" viewBox="0 0 100 100">
           {/* Background circle */}
           <circle
             cx="50"
@@ -77,7 +77,7 @@ export function TimerDisplay({ timerState }: TimerDisplayProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth="2"
-            className="text-gray-300 dark:text-gray-600"
+            className="opacity-15"
           />
           {/* Progress circle */}
           <circle
@@ -87,44 +87,38 @@ export function TimerDisplay({ timerState }: TimerDisplayProps) {
             fill="none"
             stroke="currentColor"
             strokeWidth="3"
-            strokeLinecap="round"
-            className={clsx(
-              'transition-all duration-1000 ease-in-out',
-              getSessionColor()
-            )}
+            strokeLinecap="square"
+            className="transition-all duration-1000 ease-in-out"
             strokeDasharray={`${2 * Math.PI * 45}`}
             strokeDashoffset={`${2 * Math.PI * 45 * (1 - getProgressPercentage() / 100)}`}
           />
         </svg>
-        
+
         {/* Timer Text - Centered */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className={clsx(
-              'text-6xl font-bold timer-text tracking-tight leading-none',
-              timerState.status === 'running' ? 'animate-pulse' : '',
-              getSessionColor()
-            )}>
-              {formatTime(minutes)}:{formatTime(seconds)}
-            </div>
+          <div
+            className={clsx(
+              'text-4xl sm:text-5xl timer-text leading-none',
+              timerState.status === 'running' ? 'animate-pulse' : ''
+            )}
+          >
+            {formatTime(minutes)}:{formatTime(seconds)}
           </div>
         </div>
       </div>
 
-      {/* Status - Moved below timer */}
-      <div className="space-y-4">
-        <div className="text-lg text-gray-500 dark:text-gray-400 font-semibold tracking-wide capitalize">
-          {timerState.status}
+      {/* Status */}
+      <div className="flex flex-col items-center gap-2">
+        <div className="text-sm text-[color:var(--muted-foreground)] font-arcade uppercase tracking-wide">
+          [ {timerState.status} ]
         </div>
 
-        {/* Status Message */}
         {timerState.status === 'completed' && (
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 border border-purple-200 dark:border-purple-700/40 rounded-2xl p-6">
-            <p className="text-xl font-bold text-purple-700 dark:text-purple-300 mb-1">
-              🎉 {getSessionTitle()} completed!
-            </p>
-            <p className="text-purple-600 dark:text-purple-400 font-medium">
-              Ready for the next session?
+          <div className="neon-panel-cyan rounded-none px-4 py-2 hud-corners text-cyan-300">
+            <span className="hud-tr" />
+            <span className="hud-br" />
+            <p className="text-sm font-arcade neon-text-cyan">
+              LEVEL CLEAR!
             </p>
           </div>
         )}

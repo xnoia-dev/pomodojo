@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Todo } from '@/types/todo';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
 import { useTodos } from '@/hooks/useTodos';
 import { TodoAddForm } from './TodoAddForm';
 import { TodoItem } from './TodoItem';
@@ -18,7 +17,6 @@ export function TodoList({ onActiveTodoChange }: TodoListProps) {
     updateTodo,
     deleteTodo,
     setActiveTodo,
-    getActiveTodo,
     getPendingTodos,
     getCompletedTodos,
     activeTodo,
@@ -26,7 +24,6 @@ export function TodoList({ onActiveTodoChange }: TodoListProps) {
 
   const pendingTodos = getPendingTodos();
   const completedTodos = getCompletedTodos();
-  const currentActiveTodo = getActiveTodo();
 
   const handleAddTodo = (text: string, priority: Todo['priority'], estimatedPomodoros: number) => {
     addTodo(text, priority, estimatedPomodoros);
@@ -46,46 +43,37 @@ export function TodoList({ onActiveTodoChange }: TodoListProps) {
     onActiveTodoChange?.(newActiveTodo ? todo : null);
   };
 
+  const currentActiveTodo = pendingTodos.find((t) => t.id === activeTodo) ?? null;
+
   return (
-    <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border border-white/20 dark:border-gray-700/20 shadow-xl overflow-hidden">
-      {/* Compact Header */}
-      <CardHeader className="pb-3 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
-              <span className="text-lg">📋</span>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                Tasks
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {pendingTodos.length} pending
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowCompleted(!showCompleted)}
-            className={`relative h-7 px-2 rounded-lg font-medium text-xs transition-all duration-200 transform hover:scale-105 active:scale-95 ${
-              showCompleted 
-                ? 'bg-purple-100 dark:bg-purple-800/50 text-purple-700 dark:text-purple-300 shadow-md' 
-                : 'bg-gray-100 dark:bg-gray-700/50 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-sm'
-            }`}
-          >
-            <div className="flex items-center gap-1">
-              <span>{showCompleted ? '👁️' : '👁️‍🗨️'}</span>
-              <span className="hidden sm:inline">Show Completed</span>
-              {completedTodos.length > 0 && (
-                <span className="ml-1 px-1.5 py-0.5 bg-white/50 dark:bg-gray-800/50 rounded-full text-xs font-semibold">
-                  {completedTodos.length}
-                </span>
-              )}
-            </div>
-          </button>
+    <div className="neon-panel-cyan hud-corners h-full flex flex-col min-h-0 text-[color:var(--neon-cyan)]">
+      <span className="hud-tr" />
+      <span className="hud-br" />
+
+      {/* Header */}
+      <div className="shrink-0 p-3 border-b border-[color:var(--neon-cyan)]/30 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <h3 className="text-sm font-arcade neon-text-cyan uppercase truncate">
+            Quest Log
+          </h3>
+          <p className="text-xs font-terminal text-[color:var(--muted-foreground)]">
+            {pendingTodos.length} pending
+          </p>
         </div>
-      </CardHeader>
-      
-      <CardContent className="p-3 space-y-3">
+        <button
+          onClick={() => setShowCompleted(!showCompleted)}
+          className={`shrink-0 h-7 px-3 border font-arcade text-[10px] uppercase transition-colors duration-150 ${
+            showCompleted
+              ? 'bg-[color:var(--neon-cyan)]/20 border-[color:var(--neon-cyan)]/50 text-[color:var(--neon-cyan)]'
+              : 'bg-[rgba(var(--overlay-rgb),0.05)] border-[color:var(--hairline)] text-[color:var(--muted-foreground)] hover:text-[color:var(--foreground)]'
+          }`}
+        >
+          Done {completedTodos.length > 0 && `(${completedTodos.length})`}
+        </button>
+      </div>
+
+      {/* Scrollable body */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3">
         {/* Add Form */}
         <TodoAddForm onAddTodo={handleAddTodo} />
 
@@ -97,20 +85,13 @@ export function TodoList({ onActiveTodoChange }: TodoListProps) {
         {/* Pending Todos */}
         <div className="space-y-2">
           {pendingTodos.length === 0 ? (
-            <div className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-gray-800/50 dark:to-gray-900/50 border border-gray-200/50 dark:border-gray-700/50 rounded-xl p-6 text-center">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-400/5 to-purple-400/5 rounded-full blur-lg" />
-              
-              <div className="relative">
-                <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-xl flex items-center justify-center shadow-md">
-                  <span className="text-2xl">✨</span>
-                </div>
-                <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">
-                  All caught up!
-                </h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  No pending tasks. Add some goals above!
-                </p>
-              </div>
+            <div className="border border-[color:var(--hairline)] bg-[rgba(var(--overlay-rgb),0.05)] p-6 text-center">
+              <p className="text-sm font-arcade text-[color:var(--muted-foreground)] uppercase mb-1">
+                All Clear
+              </p>
+              <p className="text-xs font-terminal text-[color:var(--muted-foreground)]">
+                No pending quests. Add one above!
+              </p>
             </div>
           ) : (
             pendingTodos.map((todo) => (
@@ -128,57 +109,44 @@ export function TodoList({ onActiveTodoChange }: TodoListProps) {
 
         {/* Completed Todos */}
         {showCompleted && completedTodos.length > 0 && (
-          <div className="space-y-2 pt-3 border-t border-gray-200/50 dark:border-gray-700/50">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
-                <span className="text-xs">✅</span>
-              </div>
-              <h4 className="font-bold text-gray-900 dark:text-gray-100 text-sm">
+          <div className="space-y-2 pt-3 border-t border-[color:var(--hairline)]">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-arcade text-[10px] uppercase text-[color:var(--neon-green)]">
                 Completed
               </h4>
-              <div className="flex-1 h-px bg-gradient-to-r from-green-300 to-transparent dark:from-green-600" />
-              <span className="text-xs font-medium text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-2 py-0.5 rounded-full">
+              <div className="flex-1 h-px bg-[color:var(--neon-green)]/30" />
+              <span className="text-[10px] font-arcade text-[color:var(--neon-green)]">
                 {completedTodos.length}
               </span>
             </div>
-            
+
             {completedTodos.map((todo) => (
               <div
                 key={todo.id}
-                className="group relative overflow-hidden bg-white/30 dark:bg-gray-800/30 border border-gray-200/20 dark:border-gray-700/20 backdrop-blur-sm rounded-xl transition-all duration-200 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                className="group relative border border-[color:var(--hairline)] bg-[rgba(var(--overlay-rgb),0.05)]"
               >
-                <div className="relative flex items-center gap-3 p-3 opacity-70 hover:opacity-85 transition-opacity duration-200">
-                  {/* Completed Checkbox */}
+                <div className="relative flex items-center gap-3 p-2.5 opacity-60 hover:opacity-90 transition-opacity duration-150">
                   <button
                     onClick={() => handleToggleComplete(todo)}
-                    className="relative w-5 h-5 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-200 transform hover:scale-110"
+                    className="relative w-5 h-5 border-2 border-[color:var(--neon-green)] bg-[color:var(--neon-green)]/20 text-[color:var(--neon-green)] flex items-center justify-center flex-shrink-0"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                       <polyline points="20,6 9,17 4,12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
-                  
-                  {/* Content */}
+
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-gray-600 dark:text-gray-400 line-through truncate text-sm">
+                    <div className="font-terminal text-[color:var(--muted-foreground)] line-through truncate text-sm">
                       {todo.text}
                     </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-500 dark:text-gray-500 bg-gray-100 dark:bg-gray-700/50 px-1.5 py-0.5 rounded-full">
-                        {todo.completedPomodoros}/{todo.estimatedPomodoros} 🍅
-                      </span>
-                      {todo.completedAt && (
-                        <span className="text-xs text-gray-500 dark:text-gray-500">
-                          {new Date(todo.completedAt).toLocaleDateString()}
-                        </span>
-                      )}
+                    <div className="text-[10px] font-arcade text-[color:var(--muted-foreground)] mt-0.5">
+                      {todo.completedPomodoros}/{todo.estimatedPomodoros}
                     </div>
                   </div>
-                  
-                  {/* Delete Button */}
+
                   <button
                     onClick={() => deleteTodo(todo.id)}
-                    className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg bg-white/60 dark:bg-gray-700/60 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-500 hover:text-red-500 transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md flex items-center justify-center"
+                    className="opacity-0 group-hover:opacity-100 w-6 h-6 border border-[color:var(--hairline)] hover:border-[color:var(--neon-red)]/40 hover:bg-[color:var(--neon-red)]/20 text-[color:var(--muted-foreground)] hover:text-[color:var(--neon-red)] transition-all duration-150 flex items-center justify-center"
                   >
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
                       <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -191,7 +159,7 @@ export function TodoList({ onActiveTodoChange }: TodoListProps) {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

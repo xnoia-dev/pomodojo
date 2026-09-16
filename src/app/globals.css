@@ -1,25 +1,66 @@
 @import "tailwindcss";
 
-/* Light theme (default) */
+/* ===== Arcade / Gamebot palette =====
+   Two distinct cabinets: DARK is the CRT-at-midnight look, LIGHT is the
+   cabinet-under-daylight / printed-manual look. Neon accent hues (magenta,
+   cyan, yellow, green, red) stay constant across both - only the surfaces,
+   ink and effect intensities shift. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --card: #ffffff;
-  --card-foreground: #171717;
-  --border: #e5e7eb;
-  --muted: #f9fafb;
-  --muted-foreground: #6b7280;
+  --neon-magenta: #ff2fd0;
+  --neon-cyan: #00fff9;
+  --neon-yellow: #ffe600;
+  --neon-green: #39ff14;
+  --neon-red: #ff2b4e;
 }
 
-/* Dark theme */
-:root.dark {
-  --background: #0f0f23;
-  --foreground: #ededed;
-  --card: #1a1a2e;
-  --card-foreground: #ededed;
-  --border: #374151;
-  --muted: #1f2937;
-  --muted-foreground: #9ca3af;
+:root, :root.dark {
+  --background: #050308;
+  --foreground: #eafcff;
+  --card: #0d0a16;
+  --card-foreground: #eafcff;
+  --border: #ff2fd0;
+  --muted: #120c1f;
+  --muted-foreground: #8b86a8;
+
+  --grid-line: rgba(0, 255, 249, 0.08);
+  --glow-a: rgba(255, 47, 208, 0.12);
+  --glow-b: rgba(0, 255, 249, 0.1);
+  --panel-bg: rgba(10, 8, 20, 0.72);
+  --inset-bg: rgba(0, 0, 0, 0.45);
+  --chrome-bg: rgba(0, 0, 0, 0.5);
+  --overlay-rgb: 255, 255, 255;
+  --hairline: rgba(255, 255, 255, 0.1);
+  --hairline-strong: rgba(255, 255, 255, 0.2);
+  --vignette: rgba(0, 0, 0, 0.75);
+  --scanline-alpha: 0.18;
+  --cursor-blend: screen;
+  --scrollbar-track: #0d0a16;
+}
+
+/* Cabinet under daylight: warm paper background, deep ink text, solid
+   light surfaces instead of black glass. */
+:root.light {
+  --background: #f3ecdd;
+  --foreground: #17101f;
+  --card: #fffaf0;
+  --card-foreground: #17101f;
+  --border: #ff2fd0;
+  --muted: #ece1cc;
+  --muted-foreground: #4a3f56;
+
+  --grid-line: rgba(120, 30, 120, 0.1);
+  --glow-a: rgba(255, 47, 208, 0.14);
+  --glow-b: rgba(0, 190, 200, 0.12);
+  --panel-bg: rgba(255, 250, 240, 0.94);
+  --inset-bg: rgba(255, 255, 255, 0.96);
+  --chrome-bg: rgba(255, 250, 240, 0.88);
+  --overlay-rgb: 23, 16, 31;
+  --hairline: rgba(23, 16, 31, 0.2);
+  --hairline-strong: rgba(23, 16, 31, 0.36);
+  --vignette: rgba(60, 30, 70, 0.1);
+  --scanline-alpha: 0.05;
+  --cursor-blend: multiply;
+  --scrollbar-track: #ece1cc;
 }
 
 @theme inline {
@@ -30,157 +71,293 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-terminal);
+  --font-mono: var(--font-terminal);
+  --font-arcade: var(--font-arcade);
 }
 
-/* Better font rendering */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  overscroll-behavior: none;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+  font-family: var(--font-terminal), 'Courier New', monospace;
+  font-size: 18px;
+  overflow: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Sharp text for headings and important elements */
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  text-rendering: optimizeLegibility;
+/* Background grid + vignette, sits behind everything */
+.arcade-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--background);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, var(--glow-a), transparent 60%),
+    radial-gradient(ellipse at 50% 100%, var(--glow-b), transparent 60%);
+  background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+  transition: background-color 0.3s ease;
 }
 
-/* Timer text specific styling */
+/* Scanline + CRT flicker overlay, sits above everything */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, var(--scanline-alpha)) 0px,
+    rgba(0, 0, 0, var(--scanline-alpha)) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+.crt-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 160px var(--vignette);
+  animation: flicker 6s infinite steps(60);
+}
+
+@keyframes flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97% { opacity: 0.94; }
+  98% { opacity: 1; }
+  99% { opacity: 0.9; }
+}
+
+.font-arcade {
+  font-family: var(--font-arcade), 'Press Start 2P', monospace;
+}
+
+.font-terminal {
+  font-family: var(--font-terminal), 'VT323', monospace;
+}
+
+/* ===== Neon text glow ===== */
+.neon-text-magenta {
+  color: var(--neon-magenta);
+  text-shadow: 0 0 4px var(--neon-magenta), 0 0 14px rgba(255, 47, 208, 0.6), 0 0 28px rgba(255, 47, 208, 0.3);
+}
+.neon-text-cyan {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 4px var(--neon-cyan), 0 0 14px rgba(0, 255, 249, 0.6), 0 0 28px rgba(0, 255, 249, 0.3);
+}
+.neon-text-yellow {
+  color: var(--neon-yellow);
+  text-shadow: 0 0 4px var(--neon-yellow), 0 0 14px rgba(255, 230, 0, 0.6), 0 0 28px rgba(255, 230, 0, 0.3);
+}
+.neon-text-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 4px var(--neon-green), 0 0 14px rgba(57, 255, 20, 0.6);
+}
+
+/* ===== Neon panel: glass with a glowing border (surface flips per theme) ===== */
+.neon-panel {
+  background: var(--panel-bg);
+  border: 2px solid var(--neon-magenta);
+  box-shadow:
+    0 0 8px rgba(255, 47, 208, 0.45),
+    0 0 24px rgba(255, 47, 208, 0.15),
+    inset 0 0 24px rgba(255, 47, 208, 0.05);
+  backdrop-filter: blur(10px);
+  transition: background-color 0.3s ease;
+}
+
+.neon-panel-cyan {
+  border-color: var(--neon-cyan);
+  box-shadow:
+    0 0 8px rgba(0, 255, 249, 0.45),
+    0 0 24px rgba(0, 255, 249, 0.15),
+    inset 0 0 24px rgba(0, 255, 249, 0.05);
+}
+
+.neon-panel-yellow {
+  border-color: var(--neon-yellow);
+  box-shadow:
+    0 0 8px rgba(255, 230, 0, 0.45),
+    0 0 24px rgba(255, 230, 0, 0.15),
+    inset 0 0 24px rgba(255, 230, 0, 0.05);
+}
+
+/* ===== HUD corner brackets (the "gamebot" targeting-reticle look) ===== */
+.hud-corners {
+  position: relative;
+}
+.hud-corners::before,
+.hud-corners::after,
+.hud-corners > .hud-tr,
+.hud-corners > .hud-br {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: currentColor;
+  pointer-events: none;
+}
+.hud-corners::before {
+  top: -2px;
+  left: -2px;
+  border-top: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+}
+.hud-corners::after {
+  bottom: -2px;
+  right: -2px;
+  border-bottom: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+.hud-corners > .hud-tr {
+  top: -2px;
+  right: -2px;
+  border-top: 3px solid currentColor;
+  border-right: 3px solid currentColor;
+}
+.hud-corners > .hud-br {
+  bottom: -2px;
+  left: -2px;
+  border-bottom: 3px solid currentColor;
+  border-left: 3px solid currentColor;
+}
+
+/* ===== Timer digits (LCD/terminal readout, not the blocky arcade font) ===== */
 .timer-text {
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  text-shadow: 0 0 1px rgba(0,0,0,0.1);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-terminal), 'VT323', monospace;
+  letter-spacing: 0.08em;
+  -webkit-text-stroke: 1.5px currentColor;
 }
 
 .timer-title {
-  font-weight: 700;
-  letter-spacing: -0.015em;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-family: var(--font-arcade), 'Press Start 2P', monospace;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
-/* Custom animations for timer */
+/* ===== Blinking cursor / "insert coin" style blink ===== */
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+/* ===== Slow pulse (session complete / active states) ===== */
 @keyframes pulse-slow {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
 }
-
 .animate-pulse-slow {
   animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Timer circle effects */
-.timer-circle {
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+/* ===== Arcade button base: chunky bezel with hard drop shadow ===== */
+.arcade-btn {
+  font-family: var(--font-arcade), 'Press Start 2P', monospace;
+  text-transform: uppercase;
+  border: 2px solid currentColor;
+  box-shadow: 4px 4px 0 0 currentColor;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.arcade-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 0 currentColor;
 }
 
-:root.dark .timer-circle {
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+.timer-circle {
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+/* ===== Cursor-follow FX: ambient glow + trailing target-lock reticle ===== */
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 520px;
+  height: 520px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 47, 208, 0.16) 0%, rgba(0, 255, 249, 0.08) 35%, transparent 70%);
+  filter: blur(10px);
+  mix-blend-mode: var(--cursor-blend);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+
+.cursor-reticle-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  color: var(--neon-cyan);
+  pointer-events: none;
+  z-index: 70;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  will-change: transform;
+}
+
+.cursor-reticle {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 5px currentColor);
+  animation: reticle-spin 6s linear infinite;
+}
+
+@keyframes reticle-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-glow,
+  .cursor-reticle-wrap {
+    display: none;
+  }
+}
+
+/* ===== Scrollbars ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--neon-magenta);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
 }
 
 /* Focus styles */
 .focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #8b5cf6, 0 0 0 4px rgba(139, 92, 246, 0.2);
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-:root.dark ::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-
-:root.dark ::-webkit-scrollbar-thumb {
-  background: #475569;
-}
-
-:root.dark ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Glass morphism with theme support */
-.glass-light {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-.glass-dark {
-  background: rgba(26, 26, 46, 0.4);
-  backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(75, 85, 99, 0.4);
-}
-
-/* Theme-aware backgrounds */
-.bg-gradient-light {
-  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 25%, #e0e7ff 75%, #dbeafe 100%);
-}
-
-.bg-gradient-dark {
-  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 75%, #0f3460 100%);
-}
-
-.header-light {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(168, 85, 247, 0.2);
-}
-
-.header-dark {
-  background: rgba(15, 15, 35, 0.85);
-  border-color: rgba(168, 85, 247, 0.3);
-}
-
-.footer-light {
-  background: rgba(255, 255, 255, 0.4);
-  border-color: rgba(168, 85, 247, 0.2);
-}
-
-.footer-dark {
-  background: rgba(15, 15, 35, 0.4);
-  border-color: rgba(168, 85, 247, 0.3);
-}
-
-/* Better button text */
-button {
-  font-weight: 500;
-  letter-spacing: -0.005em;
+  box-shadow: 0 0 0 2px var(--neon-cyan), 0 0 0 4px rgba(0, 255, 249, 0.2);
 }
 
 /* Sharp kbd elements */
 kbd {
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  font-weight: 600;
-  letter-spacing: 0.025em;
+  font-family: var(--font-arcade), 'Press Start 2P', monospace;
 }

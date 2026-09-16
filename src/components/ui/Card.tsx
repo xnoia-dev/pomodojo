@@ -11,10 +11,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={clsx(
-          'rounded-2xl shadow-lg',
+          'rounded-none',
           {
-            'bg-white/5 backdrop-blur-sm border border-white/10': variant === 'glass',
-            'bg-white border border-gray-200 dark:bg-gray-950 dark:border-gray-800': variant === 'default',
+            'bg-[rgba(var(--overlay-rgb),0.05)] backdrop-blur-sm border border-[color:var(--neon-cyan)]/30': variant === 'glass',
+            'bg-[color:var(--card)] border border-[color:var(--neon-magenta)]/40': variant === 'default',
           },
           className
         )}
@@ -30,7 +30,7 @@ export const CardHeader = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={clsx('flex flex-col space-y-1.5 p-6 pb-4', className)}
+        className={clsx('flex flex-col space-y-1.5 p-4 pb-3 border-b border-[color:var(--hairline)]', className)}
         {...props}
       />
     );
@@ -43,7 +43,7 @@ export const CardContent = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={clsx('p-6 pt-0', className)}
+        className={clsx('p-4', className)}
         {...props}
       />
     );

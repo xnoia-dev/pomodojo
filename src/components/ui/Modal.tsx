@@ -32,28 +32,28 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm" 
+      <div
+        className="absolute inset-0 bg-black/85 backdrop-blur-sm"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/10 dark:bg-gray-900/20 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-2xl">
+      <div className="relative z-10 w-full max-w-md max-h-[85vh] flex flex-col">
+        <div className="neon-panel flex flex-col max-h-[85vh]">
           {title && (
-            <div className="flex items-center justify-between p-6 border-b border-white/10 dark:border-gray-700/20">
-              <h2 className="text-xl font-bold text-white">{title}</h2>
+            <div className="flex items-center justify-between p-4 border-b border-[color:var(--neon-magenta)]/30 shrink-0">
+              <h2 className="text-sm font-arcade neon-text-magenta">{title}</h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 transition-colors duration-200 flex items-center justify-center"
+                className="arcade-btn w-8 h-8 rounded-none bg-[color:var(--neon-red)]/10 text-[color:var(--neon-red)] hover:bg-[color:var(--neon-red)]/20 flex items-center justify-center"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-white">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="text-current">
                   <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
               </button>
             </div>
           )}
-          <div className="p-6">
+          <div className="p-5 overflow-y-auto min-h-0">
             {children}
           </div>
         </div>
